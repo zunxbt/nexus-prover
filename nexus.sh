@@ -68,6 +68,12 @@ if ! sudo apt install pkg-config libssl-dev -y; then
     exit 1
 fi
 
+if ! pidof systemd > /dev/null; then
+    show "Systemd is not running on this system. This script requires systemd." "error"
+    exit 1
+fi
+
+
 if systemctl is-active --quiet nexus.service; then
     show "nexus.service is currently running. Stopping and disabling it..."
     sudo systemctl stop nexus.service
