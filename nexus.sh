@@ -113,9 +113,6 @@ if ! sudo systemctl enable $SERVICE_NAME.service; then
     exit 1
 fi
 
-show "Service status:" "progress"
-if ! sudo systemctl status $SERVICE_NAME.service; then
-    show "Failed to retrieve service status." "error"
-fi
-
 show "Nexus Prover installation and service setup complete!"
+show "You can check Nexus Prover logs using this command : journalctl -u nexus.service -fn 50"
+echo
