@@ -63,7 +63,7 @@ fi
 cd $HOME/network-api/clients/cli
 
 show "Installing required dependencies..." "progress"
-if ! sudo apt install pkg-config libssl-dev -y; then
+if ! sudo apt install pkg-config libssl-dev protobuf-compiler -y; then
     show "Failed to install dependencies." "error"
     exit 1
 fi
