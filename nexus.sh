@@ -63,10 +63,7 @@ fi
 cd $HOME/network-api/clients/cli
 
 show "Installing required dependencies..." "progress"
-if ! sudo apt install pkg-config libssl-dev protobuf-compiler -y; then
-    show "Failed to install dependencies." "error"
-    exit 1
-fi
+sudo apt updat && sudo apt install build-essential pkg-config libssl-dev protobuf-compiler -y
 
 if systemctl is-active --quiet nexus.service; then
     show "nexus.service is currently running. Stopping and disabling it..."
