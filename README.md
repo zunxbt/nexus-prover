@@ -22,8 +22,11 @@ Begin here:
 ```bash
 3. cd $HOME/.nexus
 ```
+
 4. Then
+```bash
 echo "Your Node ID" > prover-id
+```
 ```bash
 6. sudo apt install curl && [ -f "nexus.sh" ] && rm nexus.sh; curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
 ```
