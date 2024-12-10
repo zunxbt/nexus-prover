@@ -11,9 +11,9 @@ This script is compatible with Ubuntu on local system as well as on VPS
 ```bash
 sudo systemctl start nexus.service
 ```
-
+Begin here: 
 ## Installation
-sudo apt update && sudo apt upgrade
+1.sudo apt update && sudo apt upgrade
 2. mkdir $HOME/.nexus
 3. cd $HOME/.nexus
 
