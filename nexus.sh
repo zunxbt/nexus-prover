@@ -63,7 +63,7 @@ fi
 cd $HOME/network-api/clients/cli
 
 show "Installing required dependencies..." "progress"
-sudo apt update && sudo apt upgrade && sudo apt install build-essential pkg-config libssl-dev protobuf-compiler -y
+sudo apt update && sudo apt upgrade && sudo apt install curl build-essential pkg-config libssl-dev protobuf-compiler unzip -y && curl https://github.com/protocolbuffers/protobuf/releases/download/v29.1/protoc-29.1-linux-x86_64.zip && unzip protoc-29.1-linux-x86_64.zip -d $HOME/.local && export PATH="${HOME}/.local/bin":${PATH}
 
 if systemctl is-active --quiet nexus.service; then
     show "nexus.service is currently running. Stopping and disabling it..."
