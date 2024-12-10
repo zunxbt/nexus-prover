@@ -13,7 +13,7 @@ sudo systemctl start nexus.service
 ```
 
 ## Installation
-1. sudo apt update && sudo apt upgrade
+sudo apt update && sudo apt upgrade
 2. mkdir $HOME/.nexus
 3. cd $HOME/.nexus
 
