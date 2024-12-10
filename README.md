@@ -34,3 +34,24 @@ journalctl -u nexus.service -f -n 50
 - You will see something like this, it means, it is fine
 
 ![Screenshot 2024-10-09 115039](https://github.com/user-attachments/assets/3d3065d8-cb88-44ca-88b8-ac072bcf9eff)
+
+## Imp Note
+- If you want to connect your web browser nexus prover ID with CLI, then just visit : [Nexus Beta Website](https://beta.nexus.xyz/) and then copy your prover ID from profile section
+- If you can't copy normally then watch the below video (Use f12 or just right click on empty place on the site and then click on inspect option. then go to applictaion section and copy the prover ID, don't include the double comma)
+
+
+https://github.com/user-attachments/assets/4648f062-f63a-40e1-8697-c82851ed9470
+
+
+- Now open terminal and use the below command
+```bash
+sed -i 's/.*/YOUR_PROVER_ID/' .nexus/prover-id
+```
+- Make sure to replace `YOUR_PROVER_ID` with the value u copied earlier (Example : `sed -i 's/.*/P2Fn8XlXjuWr8yeoJvE6bi2iP1I3/' .nexus/prover-id`)
+- Now restart the nexus.service using below command
+```bash
+  sudo systemctl restart nexus.service
+```
+- After some times, u will see that, your CLI nexus points will also be displayed on [Nexus Beta Website](https://beta.nexus.xyz/) upon clicking `Profile` section
+
+![image](https://github.com/user-attachments/assets/9f0eba4d-d218-4dc6-b396-b1aab84bc0cb)
