@@ -13,14 +13,23 @@ sudo systemctl start nexus.service
 ```
 Begin here: 
 ## Installation
+```bash
 1.sudo apt update && sudo apt upgrade
+```
 2. mkdir $HOME/.nexus
+```bash
 3. cd $HOME/.nexus
-
+```
 4. Then
 echo "Your Node ID" > prover-id
-5. sudo apt install curl && [ -f "nexus.sh" ] && rm nexus.sh; curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
-
+```bash
+6. sudo apt install curl && [ -f "nexus.sh" ] && rm nexus.sh; curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
+```
 ## Status
+```bash
 6. journalctl -u nexus.service -f -n 50
-7. Run this command if you forgot your node ID: cat ~/.nexus/prover-id
+```
+7. Run this command if you forgot your node ID:
+```bash
+cat ~/.nexus/prover-id
+```
