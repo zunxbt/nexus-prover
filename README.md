@@ -16,7 +16,9 @@ Begin here:
 ```bash
 1.sudo apt update && sudo apt upgrade
 ```
+```bash
 2. mkdir $HOME/.nexus
+```
 ```bash
 3. cd $HOME/.nexus
 ```
