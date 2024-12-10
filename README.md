@@ -15,11 +15,11 @@ sudo systemctl start nexus.service
 ## Installation
 - You can use either this command
 ```bash
-curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
+sudo apt install curl && curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
 ```
 - Or this command to run this script
 ```bash
-wget -qO - https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
+sudo apt install wget && wget -qO - https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
 ```
 
 ## Status
@@ -35,7 +35,7 @@ journalctl -u nexus.service -f -n 50
 
 ![Screenshot 2024-10-09 115039](https://github.com/user-attachments/assets/3d3065d8-cb88-44ca-88b8-ac072bcf9eff)
 
-## Imp Note
+## Imp Note (Try 15 mins after running the installation command)
 - If you want to connect your web browser nexus prover ID with CLI, then just visit : [Nexus Beta Website](https://beta.nexus.xyz/) and then copy your prover ID from profile section
 - If you can't copy normally then watch the below video (Use f12 or just right click on empty place on the site and then click on inspect option. then go to applictaion section and copy the prover ID, don't include the double comma)
 
