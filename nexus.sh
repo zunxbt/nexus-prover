@@ -1,7 +1,7 @@
 #!/bin/bash
 
 curl -s https://raw.githubusercontent.com/zunxbt/logo/main/logo.sh | bash
-sleep 5
+sleep 2
 
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
@@ -63,7 +63,24 @@ fi
 cd $HOME/network-api/clients/cli
 
 show "Installing required dependencies..." "progress"
-sudo apt update && sudo apt upgrade && sudo apt install wget build-essential pkg-config libssl-dev unzip -y && wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip && unzip -o protoc-21.5-linux-x86_64.zip -d protoc && sudo mv protoc/bin/protoc /usr/local/bin/ && sudo mv protoc/include/* /usr/local/include/
+sudo apt update && sudo apt upgrade && sudo apt install wget build-essential pkg-config libssl-dev unzip -y
+
+show "Downloading Protocol Buffers..." "progress"
+if ! wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip; then
+    show "Failed to download Protocol Buffers." "error"
+    exit 1
+fi
+
+show "Extracting Protocol Buffers..." "progress"
+if ! unzip -o protoc-21.5-linux-x86_64.zip -d protoc; then
+    show "Failed to extract Protocol Buffers." "error"
+    exit 1
+fi
+
+show "Installing Protocol Buffers..." "progress"
+if ! sudo mv protoc/bin/protoc /usr/local/bin/ || ! sudo mv protoc/include/* /usr/local/include/; then
+    show "Failed to move Protocol Buffers binaries." "error"
+fi
 
 if systemctl is-active --quiet nexus.service; then
     show "nexus.service is currently running. Stopping and disabling it..."
@@ -110,6 +127,5 @@ if ! sudo systemctl enable $SERVICE_NAME.service; then
     exit 1
 fi
 
-show "Nexus Prover installation and service setup complete!"
 show "You can check Nexus Prover logs using this command : journalctl -u nexus.service -fn 50"
 echo
