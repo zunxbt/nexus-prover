@@ -49,8 +49,9 @@ if ! sudo apt update; then
     exit 1
 fi
 
-# Check and install required packages
-check_and_install git
+show "Installing git.." "progress"
+sudo apt install git
+
 check_and_install wget
 check_and_install build-essential
 check_and_install pkg-config
@@ -59,10 +60,10 @@ check_and_install unzip
 
 if [ -d "$HOME/network-api" ]; then
     show "Deleting existing repository..." "progress"
-    rm -rf "$HOME/network-api"
+    sudo rm -rf "$HOME/network-api"
 fi
 
-sleep 3
+sleep 2
 
 show "Cloning Nexus-XYZ network API repository..." "progress"
 if ! git clone https://github.com/nexus-xyz/network-api.git "$HOME/network-api"; then
@@ -85,6 +86,11 @@ if ! unzip -o protoc-21.5-linux-x86_64.zip -d protoc; then
 fi
 
 show "Installing Protocol Buffers..." "progress"
+
+if [ -d "/usr/local/include/google" ]; then
+    sudo rm -rf /usr/local/include/google || { show "Failed to remove existing /usr/local/include/google directory." "error"; exit 1; }
+fi
+
 if ! sudo mv protoc/bin/protoc /usr/local/bin/ || ! sudo mv protoc/include/* /usr/local/include/; then
     show "Failed to move Protocol Buffers binaries." "error"
     exit 1
@@ -135,5 +141,5 @@ if ! sudo systemctl enable $SERVICE_NAME.service; then
     exit 1
 fi
 
-show "You can check Nexus Prover logs using this command : journalctl -u nexus.service -fn 50"
+show "Check your Nexus Prover logs using this command : journalctl -u nexus.service -fn 50"
 echo
