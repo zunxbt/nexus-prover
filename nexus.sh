@@ -7,7 +7,6 @@ BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 PINK='\033[1;35m'
 
-
 show() {
     case $2 in
         "error")
@@ -25,6 +24,19 @@ show() {
 SERVICE_NAME="nexus"
 SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
+check_and_install() {
+    PACKAGE=$1
+    if ! dpkg -l | grep -q "$PACKAGE"; then
+        show "$PACKAGE is not installed. Installing..." "progress"
+        if ! sudo apt install -y "$PACKAGE"; then
+            show "Failed to install $PACKAGE." "error"
+            exit 1
+        fi
+    else
+        show "$PACKAGE is already installed."
+    fi
+}
+
 show "Installing Rust..." "progress"
 if ! source <(wget -O - https://raw.githubusercontent.com/zunxbt/installation/main/rust.sh); then
     show "Failed to install Rust." "error"
@@ -37,15 +49,13 @@ if ! sudo apt update; then
     exit 1
 fi
 
-if ! command -v git &> /dev/null; then
-    show "Git is not installed. Installing git..." "progress"
-    if ! sudo apt install git -y; then
-        show "Failed to install git." "error"
-        exit 1
-    fi
-else
-    show "Git is already installed."
-fi
+# Check and install required packages
+check_and_install git
+check_and_install wget
+check_and_install build-essential
+check_and_install pkg-config
+check_and_install libssl-dev
+check_and_install unzip
 
 if [ -d "$HOME/network-api" ]; then
     show "Deleting existing repository..." "progress"
@@ -62,9 +72,6 @@ fi
 
 cd $HOME/network-api/clients/cli
 
-show "Installing required dependencies..." "progress"
-sudo apt update && sudo apt upgrade && sudo apt install wget build-essential pkg-config libssl-dev unzip -y
-
 show "Downloading Protocol Buffers..." "progress"
 if ! wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip; then
     show "Failed to download Protocol Buffers." "error"
@@ -80,6 +87,7 @@ fi
 show "Installing Protocol Buffers..." "progress"
 if ! sudo mv protoc/bin/protoc /usr/local/bin/ || ! sudo mv protoc/include/* /usr/local/include/; then
     show "Failed to move Protocol Buffers binaries." "error"
+    exit 1
 fi
 
 if systemctl is-active --quiet nexus.service; then
