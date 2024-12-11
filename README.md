@@ -7,27 +7,20 @@
 ---
 This script is compatible with Ubuntu on local system as well as on VPS
 - If you run on VPS, u don't need to do anything after running the installation commands
-- If you run on Local system (Ubuntu), u just need to open the terminal after turning on your system to start this prover, it will start running automatically again, if it is not running then use this command to run
-```bash
-sudo systemctl start nexus.service
-```
+- If you run on Local system (Ubuntu), u just need to open the terminal after turning on your system to start this prover, it will start running automatically again
 
 ## Installation
 - You can use either this command
 ```bash
-sudo apt install curl && [ -f "nexus.sh" ] && rm nexus.sh; curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
+sudo apt install curl && curl -sSL https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
 ```
 - Or this command to run this script
 ```bash
-sudo apt install wget && [ -f "nexus.sh" ] && rm nexus.sh; wget -qO - https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
+sudo apt install wget && wget -qO - https://raw.githubusercontent.com/zunxbt/nexus-prover/main/nexus.sh | bash
 ```
 
 ## Status
-- You can check prover status using this command
-```bash
-systemctl status nexus.service
-```
-- To check logs, use the below command
+- You can check your prover logs, using the below command
 ```bash
 journalctl -u nexus.service -f -n 50
 ```
