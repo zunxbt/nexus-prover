@@ -56,84 +56,68 @@ run_with_spinner() {
     return $exit_status
 }
 
-# Install required packages
-task "Installing system dependencies..."
-run_with_spinner "Updating packages" sudo apt-get update
-run_with_spinner "Installing dependencies" sudo apt-get install -y curl wget build-essential pkg-config libssl-dev unzip git-all
+task "Installing system packages"
+packages=(curl wget build-essential pkg-config libssl-dev unzip git-all screen)
+for pkg in "${packages[@]}"; do
+    if ! dpkg -l | grep -q "^ii  $pkg "; then
+        run_with_spinner "Installing $pkg" sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
+    else
+        info "$pkg is already installed"
+    fi
+done
 
-# Install Rust
 task "Checking Rust installation"
 if ! command -v rustc &> /dev/null; then
-    info "Rust not found. Installing..."
+    info "Installing Rust"
     curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/rust.sh | bash || error "Failed to install Rust"
-    source "$HOME/.cargo/env" || warn "Failed to source cargo environment"
+    source "$HOME/.cargo/env"
 else
-    success "Rust is already installed"
+    info "Rust is already installed"
 fi
 
-# Install Protocol Buffers
 task "Installing Protocol Buffers"
 if ! command -v protoc &> /dev/null; then
-    (
-        run_with_spinner "Downloading protoc" wget -q https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip || exit 1
-        run_with_spinner "Extracting protoc" unzip -o protoc-21.5-linux-x86_64.zip -d protoc || exit 1
-        sudo rm -rf /usr/local/include/google 2>/dev/null
-        run_with_spinner "Installing protoc" sudo mv protoc/bin/protoc /usr/local/bin/ && sudo mv protoc/include/* /usr/local/include/
-    ) || error "Protocol Buffers installation failed"
-    rm -rf protoc* 2>/dev/null
+    run_with_spinner "Downloading Protocol Buffers" wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip
+    
+    task "Extracting Protocol Buffers"
+    if ! unzip -o protoc-21.5-linux-x86_64.zip -d protoc; then
+        error "Failed to extract Protocol Buffers"
+    fi
+
+    task "Installing Protocol Buffers"
+    sudo rm -rf /usr/local/include/google 2>/dev/null
+    sudo mv protoc/bin/protoc /usr/local/bin/ || error "Failed to move protoc binary"
+    sudo mv protoc/include/* /usr/local/include/ || error "Failed to move protoc headers"
+    
+    rm -rf protoc*
+    success "Protocol Buffers installed"
 else
-    success "Protocol Buffers already installed"
+    info "Protocol Buffers is already installed"
 fi
 
-# Verify systemd
-task "Checking systemd"
-if ! command -v systemctl &> /dev/null; then
-    error "systemd is required but not installed"
-fi
-
-# Nexus setup
-NEXUS_HOME="$HOME/.nexus"
-REPO_PATH="$NEXUS_HOME/network-api"
-export NONINTERACTIVE=1
+NEXUS_HOME=$HOME/.nexus
+REPO_PATH=$NEXUS_HOME/network-api
 
 task "Setting up Nexus"
 [ -d "$NEXUS_HOME" ] || mkdir -p "$NEXUS_HOME"
 
 if [ -d "$REPO_PATH" ]; then
-    run_with_spinner "Updating repository" git -C "$REPO_PATH" stash && git -C "$REPO_PATH" fetch --tags
+    task "Updating existing repository"
+    (cd "$REPO_PATH" && git stash && git fetch --tags)
 else
-    run_with_spinner "Cloning repository" git clone https://github.com/nexus-xyz/network-api "$REPO_PATH"
+    task "Cloning repository"
+    git clone https://github.com/nexus-xyz/network-api "$REPO_PATH" || error "Failed to clone repository"
 fi
 
-latest_tag=$(git -C "$REPO_PATH" describe --tags $(git -C "$REPO_PATH" rev-list --tags --max-count=1))
-run_with_spinner "Checking out latest tag" git -C "$REPO_PATH" checkout "$latest_tag"
+task "Checking out latest release"
+(cd "$REPO_PATH" && git -c advice.detachedHead=false checkout $(git rev-list --tags --max-count=1)) || error "Failed to checkout latest version"
 
-# Create systemd service
-task "Configuring systemd service"
-SERVICE_FILE="/etc/systemd/system/nexus.service"
-USER=$(whoami)
-CARGO_PATH="$HOME/.cargo/bin/cargo"
 
-sudo tee "$SERVICE_FILE" > /dev/null <<EOF
-[Unit]
-Description=Nexus Node Service
-After=network.target
+task "Managing Nexus screen session"
+if screen -list | grep -q "Nexus"; then
+    task "Stopping existing Nexus session"
+    screen -XS Nexus quit || warn "Failed to stop existing session"
+fi
 
-[Service]
-Type=simple
-User=$USER
-WorkingDirectory=$REPO_PATH/clients/cli
-ExecStart=$CARGO_PATH run --release -- --start --beta
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-run_with_spinner "Reloading systemd" sudo systemctl daemon-reload
-run_with_spinner "Enabling service" sudo systemctl enable nexus
-run_with_spinner "Starting service" sudo systemctl start nexus
-
-success "Installation completed successfully!"
-echo -e "Run ${CYAN}journalctl -u nexus.service -f -n 50${NC} to check the service status"
+success "Installation completed successfully"
+info "Now to run the prover ${YELLOW}follow the commands in the Readme file${NC}"
