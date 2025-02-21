@@ -70,7 +70,7 @@ task "Checking Rust installation"
 if ! command -v rustc &> /dev/null; then
     info "Installing Rust"
     curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/rust.sh | bash || error "Failed to install Rust"
-    source "$HOME/.cargo/env"
+    rustup target add riscv32i-unknown-none-elf
 else
     info "Rust is already installed"
 fi
@@ -95,29 +95,5 @@ else
     info "Protocol Buffers is already installed"
 fi
 
-NEXUS_HOME=$HOME/.nexus
-REPO_PATH=$NEXUS_HOME/network-api
-
-task "Setting up Nexus"
-[ -d "$NEXUS_HOME" ] || mkdir -p "$NEXUS_HOME"
-
-if [ -d "$REPO_PATH" ]; then
-    task "Updating existing repository"
-    (cd "$REPO_PATH" && git stash && git fetch --tags)
-else
-    task "Cloning repository"
-    git clone https://github.com/nexus-xyz/network-api "$REPO_PATH" || error "Failed to clone repository"
-fi
-
-task "Checking out latest release"
-(cd "$REPO_PATH" && git -c advice.detachedHead=false checkout $(git rev-list --tags --max-count=1)) || error "Failed to checkout latest version"
-
-
-task "Managing Nexus screen session"
-if screen -list | grep -q "Nexus"; then
-    task "Stopping existing Nexus session"
-    screen -XS Nexus quit || warn "Failed to stop existing session"
-fi
-
-success "Installation completed successfully"
-info "Now to run the prover ${YELLOW}follow the commands in the Readme file${NC}"
+task "Running Nexus CLI"
+curl https://cli.nexus.xyz/ | sh
