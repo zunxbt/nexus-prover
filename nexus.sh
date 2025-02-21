@@ -29,38 +29,12 @@ task() {
     echo -e "${MAGENTA}[TASK]${NC} $1"
 }
 
-run_with_spinner() {
-    local msg="$1"
-    shift
-    local cmd=("$@")
-    local pid
-    local spin_chars='🕘🕛🕒🕡'
-    local delay=0.1
-    local i=0
-
-    "${cmd[@]}" > /dev/null 2>&1 &
-    pid=$!
-
-    printf "${MAGENTA}[TASK]${NC} %s...  " "$msg"
-
-    while kill -0 "$pid" 2>/dev/null; do
-        i=$(( (i+1) %4 ))
-        printf "\r${MAGENTA}[TASK]${NC} %s... ${CYAN}%s${NC}" "$msg" "${spin_chars:$i:1}"
-        sleep "$delay"
-    done
-
-    wait "$pid"
-    local exit_status=$?
-
-    printf "\r\033[K"
-    return $exit_status
-}
 
 task "Installing system packages"
 packages=(curl wget build-essential pkg-config libssl-dev unzip git-all screen)
 for pkg in "${packages[@]}"; do
     if ! dpkg -l | grep -q "^ii  $pkg "; then
-        run_with_spinner "Installing $pkg" sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
     else
         info "$pkg is already installed"
     fi
@@ -80,7 +54,7 @@ fi
 
 task "Installing Protocol Buffers"
 if ! command -v protoc &> /dev/null; then
-    run_with_spinner "Downloading Protocol Buffers" wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v21.5/protoc-21.5-linux-x86_64.zip
     
     task "Extracting Protocol Buffers"
     if ! unzip -o protoc-21.5-linux-x86_64.zip -d protoc; then
