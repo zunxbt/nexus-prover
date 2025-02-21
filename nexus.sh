@@ -70,6 +70,9 @@ task "Checking Rust installation"
 if ! command -v rustc &> /dev/null; then
     info "Installing Rust"
     curl -sSL https://raw.githubusercontent.com/zunxbt/installation/main/rust.sh | bash || error "Failed to install Rust"
+    sleep 2
+    . "$HOME/.cargo/env"
+    sleep 1
     rustup target add riscv32i-unknown-none-elf
 else
     info "Rust is already installed"
